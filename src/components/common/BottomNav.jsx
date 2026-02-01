@@ -1,18 +1,22 @@
 import React from 'react';
-import { Home, Brain, Leaf, Calendar, MessageCircle } from 'lucide-react';
+import { Home, Brain, Leaf, Calendar, MessageCircle, Calculator } from 'lucide-react'; // Import Calculator icon
+import { useLanguage } from '../../context/LanguageContext';
 
 const sections = [
   { id: 'home', Icon: Home, title: { en: 'Home', bn: 'হোম' } },
   { id: 'agriculture', Icon: Brain, title: { en: 'Agriculture', bn: 'কৃষি' } },
   { id: 'crop-calendar', Icon: Leaf, title: { en: 'Crop Cal', bn: 'ফসল' } },
   { id: 'calendar', Icon: Calendar, title: { en: 'Calendar', bn: 'ক্যালেন্ডার' } },
-  { id: 'ai', Icon: MessageCircle, title: { en: 'AI Help', bn: 'সাহায্য' } }
+  { id: 'ai', Icon: MessageCircle, title: { en: 'AI Help', bn: 'সাহায্য' } },
+  { id: 'calculator', Icon: Calculator, title: { en: 'Calculator', bn: 'ক্যালকুলেটর' } } // NEW ITEM
 ];
 
-const BottomNav = ({ activeSection, setActiveSection, language }) => {
+const BottomNav = ({ activeSection, setActiveSection }) => {
+  const { language } = useLanguage();
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-safe z-50">
-      <div className="max-w-md mx-auto grid grid-cols-5 p-2">
+      <div className="max-w-md mx-auto grid grid-cols-6 p-2"> {/* Changed to grid-cols-6 for 6 items */}
         {sections.map(({ id, Icon, title }) => (
           <button
             key={id}
