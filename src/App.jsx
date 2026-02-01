@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from './components/common/Header';
 import BottomNav from './components/common/BottomNav';
 
@@ -10,40 +10,32 @@ import CropCalendarView from './components/views/CropCalendarView';
 import AIChatView from './components/views/AIChatView';
 import AgricultureCalculator from './components/views/AgricultureCalculator';
 
-// Import Context Hook to access global language
-import { useLanguage } from './context/LanguageContext';
-
 function App() {
-  const { language } = useLanguage(); // Access global language state
   const [activeSection, setActiveSection] = useState('home');
-
-  // Dynamic Browser Tab Title
-  useEffect(() => {
-    document.title = language === 'en' ? 'Projukti Bondhu' : 'প্রযুক্তি বন্ধু';
-  }, [language]);
+  const [language, setLanguage] = useState('en'); // Managing state locally again
 
   const renderContent = () => {
     switch (activeSection) {
       case 'home':
-        return <HomeView />;
+        return <HomeView language={language} />;
       case 'agriculture':
-        return <AgricultureView />;
+        return <AgricultureView language={language} />;
       case 'crop-calendar':
-        return <CropCalendarView />;
+        return <CropCalendarView language={language} />;
       case 'calendar':
-        return <CalendarView />;
+        return <CalendarView language={language} />;
       case 'ai':
-        return <AIChatView />;
+        return <AIChatView language={language} />;
       case 'calculator':
-        return <AgricultureCalculator />;
+        return <AgricultureCalculator language={language} />;
       default:
-        return <HomeView />;
+        return <HomeView language={language} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-      <Header />
+      <Header language={language} setLanguage={setLanguage} /> {/* Passing state and updater */}
       
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-md mx-auto min-h-full">
@@ -51,10 +43,7 @@ function App() {
         </div>
       </main>
 
-      <BottomNav 
-        activeSection={activeSection} 
-        setActiveSection={setActiveSection} 
-      />
+      <BottomNav language={language} activeSection={activeSection} setActiveSection={setActiveSection} />
     </div>
   );
 }
