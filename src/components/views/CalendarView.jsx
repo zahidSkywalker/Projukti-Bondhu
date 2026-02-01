@@ -45,6 +45,9 @@ const CalendarView = ({ language }) => {
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
 
+    // FIX: Calculate bangla info for the Header here
+    const bangla = gregorianToBangla(currentMonth); 
+
     const monthName = currentMonth.toLocaleString(language === 'en' ? 'en-US' : 'bn-BD', { month: 'long', year: 'numeric' });
     const dayNames = language === 'en' 
       ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -66,7 +69,8 @@ const CalendarView = ({ language }) => {
       const isSelected = selectedDate && formatDateKey(selectedDate) === dateKey;
       const isToday = isCurrentMonth && day === today.getDate();
       const colorClass = colors[day % colors.length];
-      const bangla = gregorianToBangla(date);
+      // Variable shadowing is allowed here, different from the one above
+      const dayBangla = gregorianToBangla(date);
 
       days.push(
         <button
@@ -79,7 +83,7 @@ const CalendarView = ({ language }) => {
            {isToday && <div className="absolute -top-1 -right-1 bg-yellow-400 text-yellow-900 text-[8px] font-bold px-1.5 py-0.5 rounded-full shadow-sm z-20">TODAY</div>}
            <div className="flex flex-col items-center justify-center h-full">
              <span className={`text-sm font-bold ${isSelected ? 'text-green-800' : 'text-gray-800'}`}>{day}</span>
-             <span className="text-[9px] font-semibold text-indigo-700 leading-tight">{toBanglaNumber(bangla.bDay)} {bangla.monthName.substring(0, 3)}</span>
+             <span className="text-[9px] font-semibold text-indigo-700 leading-tight">{toBanglaNumber(dayBangla.bDay)} {dayBangla.monthName.substring(0, 3)}</span>
              {hasNotes && <div className="text-[7px] font-semibold text-green-800 mt-0.5">●</div>}
            </div>
         </button>
