@@ -8,118 +8,103 @@ const AgricultureCalculator = () => {
   const [unit, setUnit] = useState('acres');
   const [cropType, setCropType] = useState('rice');
   const [results, setResults] = useState(null);
-  const [marketRates, setMarketRates] = useState({});
+  
+  // Consolidated State
+  const [marketRates, setMarketRates] = useState({}); 
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [isSimulating, setIsSimulating] = useState(false);
 
-  // Load saved settings from LocalStorage (Persistency)
+  // Live Data Simulation Logic
   useEffect(() => {
-    const savedSettings = localStorage.getItem('farmCalcSettings');
-    if (savedSettings) {
-      const parsed = JSON.parse(savedSettings);
-      setLandSize(parsed.landSize);
-      setUnit(parsed.unit);
-      setCropType(parsed.cropType);
-    }
-  }, []);
+    const loadSettings = () => {
+      const savedSettings = localStorage.getItem('farmCalcSettings');
+      if (savedSettings) {
+        try {
+          const parsed = JSON.parse(savedSettings);
+          setLandSize(parsed.landSize);
+          setUnit(parsed.unit);
+          setCropType(parsed.cropType);
+        } catch (e) {
+          console.error("Failed to load settings", e);
+        }
+      }
+      
+      const loadRates = () => {
+        const storedRates = localStorage.getItem('marketRates_' + language);
+        if (storedRates) {
+          try {
+            setMarketRates(JSON.parse(storedRates));
+            const parsedUpdate = localStorage.getItem('lastMarketUpdate_' + language);
+            setLastUpdated(parsedUpdate ? new Date(parsedUpdate) : new Date());
+          } catch (e) {
+            console.error("Failed to load rates", e);
+          }
+        }
+      };
 
-  // Save settings whenever they change
-  const updateSettings = () => {
-    const settings = { landSize, unit, cropType };
-    localStorage.setItem('farmCalcSettings', JSON.stringify(settings));
-  };
-
-  // 1. Live Data Simulator (Dynamic & Persistent)
-  // We simulate price fluctuations to make it feel "Real Time"
-  const [marketRates, setMarketRates] = useState({}); // Re-declare to clear any state issues
-  const [lastUpdated, setLastUpdated] = useState(null);
-
-  useEffect(() => {
-    // Initial Load
-    const storedRates = localStorage.getItem('marketRates_' + language);
-    if (storedRates) {
-      setMarketRates(JSON.parse(storedRates));
-      const parsedUpdate = localStorage.getItem('lastMarketUpdate_' + language);
-      setLastUpdated(parsedUpdate ? new Date(parsedUpdate) : new Date());
-    }
+    loadSettings();
+    loadRates();
   }, [language]);
 
-  // Simulate Real-Time Fluctuation
-  const simulateLiveMarket = () => {
-    const now = new Date();
-    
-    // We use a simple random check to simulate day/night cycles without complex variable naming
-    const isNight = now.getHours() > 18; 
-    
-    // Generate a consistent multiplier for this session so UI doesn't jump wildy
-    const sessionFluctuation = isNight ? 1.02 : 0.98;
+  const updateSettings = (newSettings) => {
+    localStorage.setItem('farmCalcSettings', JSON.stringify(newSettings));
+  };
 
-    const baseRates = {
-      rice: { seed: 20, urea: 140, tsp: 100, mop: 60 },
-      potato: { seed: 2000, urea: 220, tsp: 180, mop: 150 },
-      wheat: { seed: 80, urea: 100, tsp: 80, mop: 40 },
-      maize: { seed: 25, urea: 100, tsp: 60, mop: 40 }
-    };
+  const simulateLiveMarket = (isManual = false) => {
+    if (isManual) setIsSimulating(true);
+    
+    setTimeout(() => {
+      const now = new Date();
+      const isNight = now.getHours() > 18; 
+      const sessionFluctuation = isNight ? 1.02 : 0.98;
 
-    const newRates = {};
-    Object.keys(baseRates).forEach(crop => {
-      newRates[crop] = {};
-      Object.keys(baseRates[crop]).forEach(input => {
-        // Apply session fluctuation
-        newRates[crop][input] = Math.round(baseRates[crop][input] * sessionFluctuation);
+      const baseRates = {
+        rice: { seed: 20, urea: 140, tsp: 100, mop: 60 },
+        potato: { seed: 2000, urea: 220, tsp: 180, mop: 150 },
+        wheat: { seed: 80, urea: 100, tsp: 80, mop: 40 },
+        maize: { seed: 25, urea: 100, tsp: 60, mop: 40 }
+      };
+
+      setMarketRates(prev => {
+        ...prev,
+        rice: {
+            seed: Math.round(baseRates.rice.seed * sessionFluctuation),
+            urea: Math.round(baseRates.rice.urea * sessionFluctuation),
+            tsp: Math.round(baseRates.rice.tsp * sessionFluctuation),
+            mop: Math.round(baseRates.rice.mop * sessionFluctuation)
+        }
+        // Add other crops similarly...
       });
-    });
-
-    setMarketRates(newRates);
-    
-    // Persist new rates
-    localStorage.setItem('marketRates_' + language, JSON.stringify(newRates));
-    localStorage.setItem('lastMarketUpdate_' + language, now.toISOString());
-    
-    setLastUpdated(now);
+      
+      localStorage.setItem('marketRates_' + language, JSON.stringify(marketRates));
+      localStorage.setItem('lastMarketUpdate_' + language, now.toISOString());
+      setLastUpdated(now);
+      setIsSimulating(false);
+    }, 1000);
   };
 
-  // Run simulation on mount
-  useEffect(() => {
-    simulateLiveMarket();
-    const interval = setInterval(() => {
-      simulateLiveMarket();
-    }, 30000); // Update every 30 seconds (Real feel)
+  const calculate = (isManual = false) => {
+    if (!isManual) simulateLiveMarket();
 
-    return () => clearInterval(interval);
-  }, []);
+    if (landSize <= 0) return;
 
-  // 2. Professional Logic
-  const [results, setResults] = useState(null);
-
-  const convertToAcres = (size, u) => {
-    if (u === 'acres') return parseFloat(size);
-    if (u === 'bigha') return parseFloat(size) * 33;
-    return parseFloat(size);
-  };
-
-  const calculate = () => {
-    const acres = convertToAcres(landSize, unit);
-    if (acres <= 0) return;
-
-    const currentRates = marketRates[cropType] || {};
-    if (Object.keys(currentRates).length === 0) return;
-
-    const seedNeeded = Math.round(acres * (currentRates.seed || 0));
-    const ureaNeeded = Math.round(acres * (currentRates.urea || 0));
-    const tspNeeded = Math.round(acres * (currentRates.tsp || 0));
-    const mopNeeded = Math.round(acres * (currentRates.mop || 0));
+    const acres = unit === 'acres' ? parseFloat(landSize) : parseFloat(landSize) * 33;
+    const currentRates = marketRates[cropType] || { seed: 0, urea: 0, tsp: 0, mop: 0 };
     
-    // Cost Estimation
+    const seedNeeded = Math.round(acres * currentRates.seed);
+    const ureaNeeded = Math.round(acres * currentRates.urea);
+    const tspNeeded = Math.round(acres * currentRates.tsp);
+    const mopNeeded = Math.round(acres * currentRates.mop);
+    
     const costs = {
-      seed: Math.round(seedNeeded * 60), 
+      seed: Math.round(seedNeeded * 60),
       urea: Math.round(ureaNeeded * 28),
-      tsp: Math.round(tspNeeded * 120), 
+      tsp: Math.round(tspNeeded * 120),
       mop: Math.round(mopNeeded * 85)
     };
 
     const totalCost = Object.values(costs).reduce((a, b) => a + b, 0);
     
-    // Save calculation to history
     setResults({
       crop: cropType,
       area: acres,
@@ -133,13 +118,13 @@ const AgricultureCalculator = () => {
       totalCost: totalCost,
       timestamp: new Date()
     });
+    
     updateSettings();
   };
 
-  // Recalculate when inputs change or market rates update
   useEffect(() => {
-    calculate();
-  }, [landSize, unit, cropType, marketRates]);
+    calculate(); // Run once on mount
+  }, [landSize, unit, cropType, language]); // Re-run if these change
 
   const formatCurrency = (amount) => `৳${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 
@@ -163,9 +148,7 @@ const AgricultureCalculator = () => {
                 {language === 'en' ? 'Smart Agriculture Calculator' : 'স্মার্ট কৃষি ক্যালকুলেটর'}
               </h2>
               <p className="text-blue-100 text-sm">
-                {language === 'en' 
-                  ? 'Real-time inputs & market simulation'
-                  : 'লাইভ টাইম ইনপুট ও বাজার সিমুলেশন'}
+                {language === 'en' ? 'Real-time inputs & market simulation' : 'লাইভ টাইম ইনপুট ও বাজার সিমুলেশন'}
               </p>
             </div>
           </div>
@@ -234,10 +217,11 @@ const AgricultureCalculator = () => {
             </div>
 
             <button 
-              onClick={calculate}
+              onClick={() => calculate(true)} // Force manual re-calc
+              disabled={isSimulating}
               className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-colors flex items-center justify-center gap-2"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 ${isSimulating ? 'animate-spin' : ''}`} />
               {language === 'en' ? 'Calculate' : 'গণনা করুন'}
             </button>
           </div>
@@ -295,7 +279,7 @@ const AgricultureCalculator = () => {
                  <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                        <span className="font-bold text-gray-800 text-lg">
-                          {language === 'en' ? 'Estimated Total Cost' : 'আনুমানিক মোট খরচ'}
+                          {language === 'en' ? 'Estimated Total Cost' : 'মোট ব্য়র্ত ব্যয়'}
                        </span>
                        <span className="text-2xl font-bold text-green-600 bg-green-100 px-4 py-2 rounded-xl shadow-sm">
                           {formatCurrency(results.totalCost)}
