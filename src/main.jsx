@@ -1,9 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import './index.css'
+import './index.css'  // <--- THIS LINE IS CRITICAL. Do not remove it.
 
-// PWA Service Worker Registration
 import { registerSW } from 'virtual:pwa-register'
 
 const updateSW = registerSW({
