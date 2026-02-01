@@ -2,31 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Sun, CloudRain, MapPin, Wind, Droplets, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react';
 import { marketProducts as baseMarketData } from '../../data/constants';
 
-const HomeView = ({ language }) => {
-  // --- Weather State ---
+const HomeView = ({ language }) => { // Accept language as prop
   const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loadingWeather, setLoadingWeather] = useState(true);
-  const [location, setLocation] = useState({ city: 'Dhaka', lat: 23.81, lon: 90.41 });
-
-  // --- Market State ---
   const [marketData, setMarketData] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshingMarket, setRefreshingMarket] = useState(false);
 
-  // 1. Fetch Real Weather (Open-Meteo - Free & No Key Required)
   useEffect(() => {
     const fetchWeather = async () => {
       setLoadingWeather(true);
       try {
-        // Try to get user location first
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
               fetchFromAPI(position.coords.latitude, position.coords.longitude);
             },
             (error) => {
-              console.log("Geo error, defaulting to Dhaka");
               fetchFromAPI(23.81, 90.41);
             }
           );
@@ -50,7 +43,6 @@ const HomeView = ({ language }) => {
         code: data.current_weather.weathercode
       });
 
-      // Process forecast (next 3 days)
       const nextDays = data.daily.time.slice(1, 4).map((date, i) => ({
         date: new Date(date),
         max: Math.round(data.daily.temperature_2m_max[i+1]),
@@ -65,27 +57,21 @@ const HomeView = ({ language }) => {
     fetchWeather();
   }, []);
 
-  // 2. Simulate/Fetch Real Market Prices
   useEffect(() => {
-    // Load base data initially
     setMarketData(baseMarketData[language]);
     setLastUpdated(new Date());
-  }, [language]);
+  }, [language]); // Re-render if language changes
 
   const refreshMarketPrices = () => {
     setRefreshingMarket(true);
-    // NOTE: Since there is no public CORS-enabled API for BD Govt markets, 
-    // we simulate a fetch here. Replace this logic with your Backend API call.
-    
     setTimeout(() => {
       const updatedPrices = baseMarketData[language].map(item => {
-        // Simulate price fluctuation (+/- 5 Taka)
         const variance = Math.floor(Math.random() * 11) - 5; 
         const newPrice = item.previousPrice + variance;
         return {
           ...item,
           currentPrice: newPrice,
-          previousPrice: item.previousPrice // Keep old price for comparison visual
+          previousPrice: item.previousPrice 
         };
       });
       setMarketData(updatedPrices);
@@ -94,18 +80,16 @@ const HomeView = ({ language }) => {
     }, 1000);
   };
 
-  // Helper: Weather Icon
   const getWeatherIcon = (code) => {
     const codes = {
       0: Sun, 1: Sun, 2: Sun, 3: CloudRain, 
-      45: CloudRain, 48: CloudRain, 51: CloudRain, 61: CloudRain,
+      45: CloudRain, 48: CloudRain, 51: CloudRain,
       63: CloudRain, 65: CloudRain, 80: CloudRain, 95: CloudRain
     };
     const Icon = codes[code] || Sun;
     return <Icon className="h-6 w-6" />;
   };
 
-  // Helper: Time format
   const formatTime = (date) => {
     return new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'bn-BD', {
       hour: '2-digit', minute: '2-digit'
@@ -140,7 +124,6 @@ const HomeView = ({ language }) => {
               </div>
             </div>
 
-            {/* Stats Row */}
             <div className="flex gap-3 text-xs bg-white/10 p-3 rounded-xl">
               <div className="flex items-center gap-1.5">
                 <Wind className="h-3.5 w-3.5 text-blue-200" />
@@ -152,7 +135,6 @@ const HomeView = ({ language }) => {
               </div>
             </div>
 
-            {/* Mini Forecast */}
             <div className="pt-2 border-t border-blue-400/30">
               <div className="text-xs text-blue-100 font-semibold mb-2">
                 {language === 'en' ? '3-Day Forecast' : '৩ দিনের পূর্বাভাস'}
