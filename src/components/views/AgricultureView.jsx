@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, Lightbulb, AlertCircle, Brain } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Lightbulb, AlertCircle, Book } from 'lucide-react';
 import { agriCategories } from '../../data/constants';
-import { useLanguage } from '../../context/LanguageContext';
 
-const AgricultureView = () => {
-  const { language } = useLanguage();
+const AgricultureView = ({ language }) => {
   const [selectedAgriTopic, setSelectedAgriTopic] = useState(null);
 
   // Helper to get specific Pro Tips based on topic
@@ -18,8 +16,8 @@ const AgricultureView = () => {
         ],
         bn: [
           "সঠিক কুশি গজানোর জন্য জমিতে পর্যাপ্ত পানি বজায় রাখুন।",
-          "রোপণের আগে মাটির pH পরীক্ষা করুন; আদর্শ মাত্রা ৬.৫–৬.৮।",
-          "বিশ্বস্ত উৎস থেকে প্রত্যয়িত বীজ ব্যবহার করুন।"
+          "রোপণের আগে মাটির pH পরীক্ষা করুন; আদর্শ মাত্রা ৫.৫–৫.৮।",
+          "নির্ভরযোগ্য উৎস থেকে প্রত্যয়িত ও মানসম্মত বীজ ব্যবহার করুন।"
         ]
       },
       fish: {
@@ -30,26 +28,26 @@ const AgricultureView = () => {
         ],
         bn: [
           "মাছের পুষ্টির জন্য পানিতে পর্যাপ্ত প্ল্যাঙ্কটন উৎপাদন নিশ্চিত করুন।",
-          "পানির গুণমান (pH, অক্সিজেন) প্রতি সপ্তাহে পরীক্ষা করুন।",
+          "পানির গুণমান (pH ও দ্রবীভূত অক্সিজেন) প্রতি সপ্তাহে পরীক্ষা করুন।",
           "রোগ ছড়ানো রোধে অতিরিক্ত মাছ মজুদ করবেন না।"
         ]
       },
       cattle: {
         en: [
-          "Keep the shed clean and well-ventilated.",
+          "Keep shed clean and well-ventilated.",
           "Follow strict vaccination schedule.",
           "Provide mineral licks to improve health."
         ],
         bn: [
           "গবাদি পশুর শেড পরিষ্কার ও পর্যাপ্ত বায়ু চলাচল নিশ্চিত করুন।",
-          "নিয়মিত ও নির্ধারিত সময়ে টিকা প্রদান করুন।",
+          "নিয়মিত ও নির্ধারিত সময়সূচি অনুযায়ী টিকা প্রদান করুন।",
           "স্বাস্থ্য উন্নয়নের জন্য মিনারেল লিক সরবরাহ করুন।"
         ]
       },
       poultry: {
         en: [
           "Ensure constant temperature for chicks (0-7 days).",
-          "Disinfect the brooding house regularly.",
+          "Disinfect brooding house regularly.",
           "Remove sick birds immediately to prevent spread."
         ],
         bn: [
@@ -65,8 +63,8 @@ const AgricultureView = () => {
           "Intercropping can increase productivity."
         ],
         bn: [
-          "বাতাস চলাচল বাড়াতে নিয়মিত ছাঁটাই করুন।",
-          "মাটির আর্দ্রতা ধরে রাখতে মালচ ব্যবহার করুন।",
+          "বাতাস চলাচল উন্নত করতে নিয়মিত ছাঁটাই করুন।",
+          "মাটির আর্দ্রতা ধরে রাখতে মালচ প্রয়োগ করুন।",
           "মিশ্র ফসল চাষে উৎপাদন বৃদ্ধি পেতে পারে।"
         ]
       },
@@ -77,7 +75,7 @@ const AgricultureView = () => {
           "Apply organic manure before planting."
         ],
         bn: [
-          "ভালো নিষ্কাশনের জন্য উঁচু বেড ব্যবহার করুন।",
+          "ভালো পানি নিষ্কাশনের জন্য উঁচু বেড ব্যবহার করুন।",
           "মাটির উর্বরতা বজায় রাখতে ফসল পর্যায়ক্রমে পরিবর্তন করুন।",
           "রোপণের আগে জৈব সার প্রয়োগ করুন।"
         ]
@@ -120,7 +118,7 @@ const AgricultureView = () => {
           {/* Timing */}
           <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-xl mb-6">
             <div className="flex items-start gap-3">
-              <div className="bg-blue-600 text-white p-3 rounded-lg shrink-0 shadow-md">
+              <div className="bg-blue-600 text-white p-3 rounded-lg">
                 <Clock className="h-6 w-6" />
               </div>
               <div>
@@ -137,7 +135,7 @@ const AgricultureView = () => {
           {/* Pro Tips */}
           <div className="bg-yellow-50 border-l-4 border-yellow-500 p-5 rounded-r-xl mb-6">
             <div className="flex items-start gap-3">
-              <div className="bg-yellow-500 text-white p-3 rounded-lg shrink-0 shadow-md">
+              <div className="bg-yellow-500 text-white p-3 rounded-lg">
                 <Lightbulb className="h-6 w-6" />
               </div>
               <div className="flex-1">
@@ -147,7 +145,7 @@ const AgricultureView = () => {
                 <ul className="space-y-2">
                   {tips.map((tip, idx) => (
                     <li key={idx} className="flex items-start text-sm text-yellow-900">
-                      <span className="mr-2 text-yellow-600 font-bold">✓</span>
+                      <span className="mr-2 font-bold">✓</span>
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -156,21 +154,43 @@ const AgricultureView = () => {
             </div>
           </div>
 
-          {/* Disclaimer */}
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <AlertCircle className="h-5 w-5 text-gray-500" />
-              <span className="font-semibold text-gray-700 text-sm">
-                {language === 'en' ? 'Official Advice' : 'সরকারি পরামর্শ'}
-              </span>
+          {/* Steps */}
+          <div>
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <Book className="h-4 w-4 mr-2" />
+              {language === 'en' ? 'Step-by-Step Guide' : 'ধাপে ধাপে নির্দেশিকা'}
+            </h3>
+
+            <div className="space-y-4">
+              {selectedAgriTopic.steps.map((step, idx) => (
+                <div key={idx} className="flex">
+                  <div className="mr-4">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-green-600 text-green-600 font-bold">
+                      {idx + 1}
+                    </div>
+                  </div>
+                  <div className="flex-1 bg-white p-4 rounded-xl border">
+                    {step}
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="text-xs text-gray-500 max-w-md mx-auto">
-              {language === 'en'
-                ? 'For region-specific guidance and technical support, please contact your local Department of Agricultural Extension (DAE).'
-                : 'অঞ্চলভিত্তিক পরামর্শ ও কারিগরি সহায়তার জন্য আপনার নিকটস্থ কৃষি সম্প্রসারণ অধিদপ্তর (DAE)-এর সাথে যোগাযোগ করুন।'
-              }
-            </p>
           </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="bg-gray-50 p-4 rounded-xl border text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <AlertCircle className="h-5 w-5 text-gray-500" />
+            <span className="font-semibold text-sm">
+              {language === 'en' ? 'Official Advice' : 'সরকারি পরামর্শ'}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 max-w-md mx-auto">
+            {language === 'en'
+              ? 'For region-specific guidance and technical support, please contact your local Department of Agricultural Extension (DAE).'
+              : 'অঞ্চলভিত্তিক পরামর্শ ও কারিগরি সহায়তার জন্য আপনার নিকটস্থ কৃষি সম্প্রসারণ অধিদপ্তর (DAE)-এর সাথে যোগাযোগ করুন।'}
+          </p>
         </div>
       </div>
     );
@@ -179,13 +199,22 @@ const AgricultureView = () => {
   return (
     <div className="space-y-4 pb-20">
       {agriCategories[language].map((category, idx) => (
-        <div key={idx} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="font-bold text-lg mb-3 text-gray-800 flex items-center">
-            <span className="bg-green-100 text-green-600 p-1.5 rounded-lg mr-2">
-              <Brain className="h-4 w-4" />
-            </span>
+        <div key={idx} className="bg-white p-4 rounded-2xl shadow-sm border">
+          <h3 className="font-bold text-lg mb-3 flex items-center">
+            <Book className="h-4 w-4 mr-2" />
             {category.title}
           </h3>
+
+          {category.items.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedAgriTopic(item)}
+              className="w-full text-left p-4 bg-gray-50 rounded-xl flex justify-between items-center hover:bg-green-50"
+            >
+              <span>{item.name}</span>
+              <ChevronRight className="h-5 w-5 text-green-600" />
+            </button>
+          ))}
         </div>
       ))}
     </div>
