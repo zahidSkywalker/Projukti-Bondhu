@@ -1,7 +1,7 @@
 import React from 'react';
 import { Leaf } from 'lucide-react';
 
-const Header = ({ language, setLanguage }) => {
+const Header = ({ language, setLanguage }) => { // Accepting props directly
   return (
     <header className="bg-green-600 text-white p-4 sticky top-0 z-50 shadow-md">
       <div className="flex justify-between items-center max-w-md mx-auto">
@@ -12,7 +12,7 @@ const Header = ({ language, setLanguage }) => {
           </h1>
         </div>
         <button
-          onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
+          onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')} // Updating App state
           className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-bold transition-all border border-white/30"
         >
           {language === 'en' ? 'বাংলা' : 'English'}
