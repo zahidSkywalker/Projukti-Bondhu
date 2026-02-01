@@ -1,9 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import './index.css'  // <--- THIS LINE IS CRITICAL. Do not remove it.
-
+import './index.css'
 import { registerSW } from 'virtual:pwa-register'
+
+// Import Provider
+import { LanguageProvider } from './context/LanguageContext.jsx'
 
 const updateSW = registerSW({
   onNeedRefresh() {
@@ -18,6 +20,8 @@ const updateSW = registerSW({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </React.StrictMode>,
 )
