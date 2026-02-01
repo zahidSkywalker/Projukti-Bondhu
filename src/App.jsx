@@ -8,12 +8,16 @@ import CalendarView from './components/views/CalendarView';
 import AgricultureView from './components/views/AgricultureView';
 import CropCalendarView from './components/views/CropCalendarView';
 import AIChatView from './components/views/AIChatView';
+import AgricultureCalculator from './components/views/AgricultureCalculator';
+
+// Import Context Hook to access global language
+import { useLanguage } from './context/LanguageContext';
 
 function App() {
-  const [language, setLanguage] = useState('en');
+  const { language } = useLanguage(); // Access global language state
   const [activeSection, setActiveSection] = useState('home');
 
-  // Set document title based on language
+  // Dynamic Browser Tab Title
   useEffect(() => {
     document.title = language === 'en' ? 'Projukti Bondhu' : 'প্রযুক্তি বন্ধু';
   }, [language]);
@@ -21,25 +25,26 @@ function App() {
   const renderContent = () => {
     switch (activeSection) {
       case 'home':
-        return <HomeView language={language} />;
+        return <HomeView />;
       case 'agriculture':
-        return <AgricultureView language={language} />;
+        return <AgricultureView />;
       case 'crop-calendar':
-        return <CropCalendarView language={language} />;
+        return <CropCalendarView />;
       case 'calendar':
-        return <CalendarView language={language} />;
+        return <CalendarView />;
       case 'ai':
-        return <AIChatView language={language} />;
+        return <AIChatView />;
+      case 'calculator':
+        return <AgricultureCalculator />;
       default:
-        return <HomeView language={language} />;
+        return <HomeView />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-      <Header language={language} setLanguage={setLanguage} />
+      <Header />
       
-      {/* Main Content Area with bottom padding to clear nav */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-md mx-auto min-h-full">
           {renderContent()}
@@ -49,7 +54,6 @@ function App() {
       <BottomNav 
         activeSection={activeSection} 
         setActiveSection={setActiveSection} 
-        language={language} 
       />
     </div>
   );
