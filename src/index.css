@@ -4,11 +4,9 @@
 
 body {
   @apply bg-gray-100 text-gray-900 antialiased;
-  /* Prevent pull-to-refresh on mobile for app-like feel */
   overscroll-behavior-y: contain; 
 }
 
-/* Custom scrollbar for chat and lists */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
